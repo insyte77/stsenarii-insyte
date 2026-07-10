@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Логика освещения — Бизнес v1.3 | INSYTE</title>
+<style>
+:root {
+  --bg: #f5f6f8; --white: #fff; --navy: #1a2340; --blue: #2563eb;
+  --blue-light: #eff6ff; --green: #16a34a; --green-light: #f0fdf4;
+  --orange: #d97706; --orange-light: #fffbeb; --gray: #6b7280;
+  --gray-light: #f9fafb; --border: #e5e7eb; --text: #111827;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; }
+.wrapper { display: flex; min-height: 100vh; }
+nav { width: 230px; min-width: 230px; background: var(--navy); color: #cbd5e1; position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 16px 0; flex-shrink: 0; }
+main { flex: 1; padding: 24px 32px; max-width: 1050px; }
+.nav-logo { padding: 8px 20px 18px; color: #fff; font-size: 13px; font-weight: 700; border-bottom: 1px solid #2d3a5a; margin-bottom: 10px; line-height: 1.4; }
+.nav-logo span { display: block; color: #93c5fd; font-size: 11px; font-weight: 400; margin-top: 4px; }
+nav a { display: block; padding: 6px 20px; color: #94a3b8; text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all .15s; }
+nav a:hover { color: #fff; background: #253156; border-left-color: var(--blue); }
+.nav-section { padding: 12px 20px 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #4b5e7e; }
+.page-header { background: var(--navy); color: #fff; border-radius: 10px; padding: 24px 28px; margin-bottom: 24px; }
+.page-header h1 { font-size: 22px; font-weight: 700; }
+.page-header .meta { display: flex; gap: 24px; margin-top: 10px; flex-wrap: wrap; }
+.page-header .meta-item { font-size: 12px; color: #94a3b8; }
+.page-header .meta-item b { color: #e2e8f0; }
+section { background: var(--white); border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+.section-header { background: #f1f5f9; border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; gap: 10px; }
+.section-header h2 { font-size: 15px; font-weight: 700; color: var(--navy); }
+.section-num { background: var(--blue); color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+.section-body { padding: 16px 20px; }
+.subsec { margin-bottom: 20px; }
+.subsec:last-child { margin-bottom: 0; }
+.subsec-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid var(--blue-light); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: var(--navy); color: #fff; padding: 8px 10px; text-align: left; font-size: 12px; font-weight: 600; }
+td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: var(--gray-light); }
+tr:hover td { background: var(--blue-light); }
+td strong { color: var(--navy); }
+.badge { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 600; }
+.badge-green { background: var(--green-light); color: var(--green); }
+.badge-orange { background: var(--orange-light); color: var(--orange); }
+.badge-blue { background: var(--blue-light); color: var(--blue); }
+.badge-gray { background: #f3f4f6; color: var(--gray); }
+.callout { border-radius: 6px; padding: 10px 14px; margin: 10px 0; font-size: 13px; border-left: 4px solid; }
+.callout-warn { background: var(--orange-light); border-color: var(--orange); color: #92400e; }
+.callout-info { background: var(--blue-light); border-color: var(--blue); color: #1e3a8a; }
+.callout-ok { background: var(--green-light); border-color: var(--green); color: #14532d; }
+/* map box */
+.map-box { background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 16px 20px; font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; line-height: 1.7; overflow-x: auto; white-space: pre; }
+/* algorithm box */
+.algo-box { background: #1e293b; color: #cbd5e1; border-radius: 6px; padding: 14px 18px; font-family: 'Consolas', 'Courier New', monospace; font-size: 12px; line-height: 1.8; overflow-x: auto; white-space: pre; }
+/* route card */
+.route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 12px; }
+.route-card { background: #f8faff; border: 1px solid #c7d7fd; border-radius: 8px; padding: 14px 16px; }
+.route-card .route-label { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.route-card .route-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+.route-card .route-path { font-family: monospace; font-size: 12px; color: #374151; background: #fff; border-radius: 4px; padding: 6px 8px; border: 1px solid #e0e7ff; }
+.route-card .route-light { font-size: 12px; color: #374151; margin-top: 8px; }
+/* zone grid */
+.zone-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 12px; }
+.zone-card { border-radius: 8px; padding: 12px 14px; border: 1px solid; }
+.zone1 { background: #fefce8; border-color: #fde047; }
+.zone2 { background: #fff7ed; border-color: #fdba74; }
+.zone3 { background: #f0fdf4; border-color: #86efac; }
+.zone4 { background: #eff6ff; border-color: #93c5fd; }
+.zone5 { background: #faf5ff; border-color: #d8b4fe; }
+.zone-card .zt { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+.zone-card .zr { font-size: 12px; }
+/* priority */
+.prio-list { counter-reset: prio; list-style: none; padding: 0; }
+.prio-list li { counter-increment: prio; display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.prio-list li:last-child { border-bottom: none; }
+.prio-list li::before { content: counter(prio); background: var(--navy); color: #fff; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+/* lux table */
+.pct-bar { display: inline-block; height: 10px; background: var(--blue); border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+@media print { nav { display: none; } main { padding: 8px; max-width: 100%; } section { break-inside: avoid; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══ INSYTE DESIGN SYSTEM ═══ */
+:root{--bg:#f8f6f3;--dark:#0b1413;--gold:#c9a36a;--gold-h:#d9b67e;--ink:#171d2c;--ink2:#525d75;--sec-bg:#f0ece4;--border:#e0ddd8;--font-d:'Cormorant Garamond',serif;--font-s:'Inter',sans-serif;}
+*{border-radius:0!important;}
+body{background:var(--bg)!important;color:var(--ink)!important;font-family:var(--font-s)!important;}
+.wrapper{display:flex;min-height:100vh;}
+nav{background:var(--dark)!important;width:224px;min-width:224px;position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid rgba(201,163,106,.15)!important;}
+.nav-logo{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)!important;margin-bottom:6px;}
+.nav-logo img{height:14px;width:auto;display:block;}
+.nav-logo a img{height:14px;width:auto;display:block;}
+.nav-logo span{display:block;margin-top:9px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.38)!important;line-height:1.7;}
+.nav-back{display:block;margin-top:9px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)!important;text-decoration:none;transition:color .2s;}
+.nav-back:hover{color:var(--gold-h)!important;}
+.nav-section{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(201,163,106,.65)!important;padding:14px 20px 4px;font-weight:600;}
+nav a:not(.nav-back){display:block;padding:7px 20px;font-size:11px;letter-spacing:.05em;color:rgba(255,255,255,.52)!important;text-decoration:none;transition:all .15s;}
+nav a:not(.nav-back):hover{color:#fff!important;background:rgba(201,163,106,.08)!important;}
+main{flex:1;padding:40px 48px;background:var(--bg)!important;}
+.page-header{background:var(--dark)!important;color:#fff!important;padding:40px 0 32px;margin-bottom:32px;border-bottom:3px solid var(--gold)!important;}
+.page-header h1{font-family:var(--font-d)!important;font-size:clamp(26px,3vw,40px)!important;font-weight:400!important;letter-spacing:.04em!important;color:#fff!important;margin:0 0 14px!important;}
+.page-header .meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:8px;}
+.page-header .meta-item{font-size:11px;color:rgba(255,255,255,.5)!important;letter-spacing:.06em;}
+.page-header .meta-item b{color:rgba(255,255,255,.85)!important;}
+.badge,.version-badge{background:var(--gold)!important;color:var(--dark)!important;font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:2px 8px;font-weight:600;display:inline-block;}
+.section-header{background:var(--sec-bg)!important;padding:16px 22px!important;border-bottom:1px solid var(--border)!important;display:flex;align-items:center;gap:12px;}
+.section-header h2,.section-header h3{font-family:var(--font-d)!important;font-size:20px!important;font-weight:500!important;letter-spacing:.03em!important;color:var(--ink)!important;margin:0!important;}
+.section-num{background:var(--dark)!important;color:var(--gold)!important;font-size:10px;font-weight:700;letter-spacing:.1em;padding:3px 8px;flex-shrink:0;}
+section{border:1px solid var(--border)!important;background:#fff;margin-bottom:24px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--ink)!important;color:#fff!important;font-family:var(--font-s);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:10px 12px;text-align:left;border:none!important;}
+td{padding:9px 12px;border-bottom:1px solid var(--border)!important;border-left:none!important;border-right:none!important;border-top:none!important;}
+tr:nth-child(even) td{background:var(--sec-bg)!important;}
+tr:hover td{background:#e8e3d8!important;}
+.callout,.note,.remark,.info-box{border:none!important;border-left:3px solid var(--gold)!important;background:var(--sec-bg)!important;color:var(--ink)!important;padding:12px 18px!important;margin:14px 0!important;}
+.map-box,.algo-box{background:var(--dark)!important;color:#e8e3d8!important;font-family:'Courier New',monospace!important;font-size:12px!important;padding:16px 18px!important;border:none!important;overflow-x:auto;}
+.route-card,.zone-card{background:var(--sec-bg)!important;border:1px solid var(--border)!important;padding:16px 20px!important;margin-bottom:10px!important;}
+.pct-bar{background:var(--gold)!important;height:8px;display:inline-block;vertical-align:middle;margin-right:6px;}
+@media print{nav{display:none!important;}main{padding:8px;max-width:100%;}section{break-inside:avoid;}.page-header{background:var(--dark)!important;-webkit-print-color-adjust:exact;}}
+</style>
+</head>
+<body>
+<style>
+/* ═══ INSYTE FIX LAYER ═══ */
+.page-header{margin:-40px -48px 32px!important;padding:40px 48px 32px!important;}
+nav a{border-left:none!important;}
+nav a:hover{border-left:none!important;background:rgba(201,163,106,.08)!important;}
+th{white-space:normal!important;letter-spacing:.08em!important;}
+.section-body{padding:20px 24px!important;}
+.subsec-title{color:var(--ink)!important;font-family:var(--font-s)!important;font-weight:600!important;font-size:12px!important;border-bottom-color:var(--border)!important;}
+td strong{color:var(--ink)!important;}
+td code{background:var(--sec-bg)!important;color:var(--ink)!important;font-family:'Courier New',monospace!important;}
+.badge-blue{background:rgba(201,163,106,.1)!important;color:#8a6d2e!important;}
+.badge-green{background:rgba(22,163,74,.08)!important;color:#166534!important;}
+.badge-orange{background:rgba(180,83,9,.08)!important;color:#92400e!important;}
+.badge-red{background:rgba(220,38,38,.08)!important;color:#991b1b!important;}
+.badge-gray{background:var(--sec-bg)!important;color:var(--ink2)!important;}
+.callout-warn{background:#fff8f0!important;border-left-color:#b45309!important;color:#78350f!important;}
+.callout-info{background:var(--sec-bg)!important;border-left-color:var(--gold)!important;color:var(--ink)!important;}
+.callout-ok{background:#f0fdf4!important;border-left-color:#16a34a!important;color:#14532d!important;}
+.route-card .route-label{color:var(--gold)!important;}
+.route-card .route-title{color:var(--ink)!important;font-family:var(--font-d)!important;font-size:16px!important;font-weight:500!important;}
+.route-card .route-path{background:var(--dark)!important;color:#e8e3d8!important;border:none!important;}
+.route-card .route-light{color:var(--ink2)!important;}
+.zone-card .zt{color:var(--ink)!important;}
+.zone-card .zr{color:var(--ink2)!important;}
+.zone1,.zone2,.zone3,.zone4,.zone5{background:var(--sec-bg)!important;}
+.zone1{border-color:var(--gold)!important;}
+.zone2{border-color:#c9856a!important;}
+.zone3{border-color:#6aad8a!important;}
+.zone4{border-color:#6a8ac9!important;}
+.zone5{border-color:#8a6ac9!important;}
+.prio-list li::before{background:var(--dark)!important;color:var(--gold)!important;}
+.prio-list li{color:var(--ink)!important;border-bottom-color:var(--border)!important;}
+</style>
+<div class="wrapper">
+
+<nav>
+  <div class="nav-logo">
+    <a href="index.html"><img src="Logo INSYTE GOLD.png" alt="INSYTE"></a>
+    <span>Логика освещения · Бизнес v1.3</span>
+    <a href="index.html" class="nav-back">← Главная</a>
+  </div>
+  <div class="nav-section">Топология</div>
+  <a href="#map">Карта связей помещений</a>
+  <a href="#conn-table">Таблица связей</a>
+  <div class="nav-section">Движение</div>
+  <a href="#routes">Трассы движения</a>
+  <a href="#zones">Зоны освещения</a>
+  <div class="nav-section">Логика</div>
+  <a href="#events">Логика по событиям</a>
+  <a href="#entry-matrix">Матрица — вход в помещение</a>
+  <a href="#timeouts">Таймауты выключения</a>
+  <div class="nav-section">Адаптация</div>
+  <a href="#lux">Датчик освещённости</a>
+  <a href="#priority">Приоритеты</a>
+</nav>
+
+<main>
+
+<div class="page-header">
+  <h1>Логика освещения по движению</h1>
+  <div class="meta">
+    <div class="meta-item"><b>Объект:</b> Одноэтажный коттедж «Бизнес-версия v1.3»</div>
+    <div class="meta-item"><b>Версия:</b> 1.0</div>
+    <div class="meta-item"><b>Дата:</b> 2026-07-08</div>
+    <div class="meta-item"><b>Датчики движения:</b> ДД-1..ДД-11 (11 штук)</div>
+  </div>
+</div>
+
+<!-- КАРТА -->
+<section id="map">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>Карта связей помещений</h2>
+  </div>
+  <div class="section-body">
+    <div class="map-box">                    ┌──────────────────────────────────────────────────────┐
+                    │                                                      │
+  [УЛИЦА] ──────► П01 ПРИХОЖАЯ ───────────────────────────────► П02 ГАРДЕРОБНАЯ
+                    │
+                    ▼
+              П03 КОРИДОР ОБЩИЙ ◄─────────────────────────────► П04 КУХНЯ-ГОСТИНАЯ
+                    │
+          ┌─────────┼──────────────────────┬──────────────────────┐
+          │         │                      │                      │
+          ▼         ▼                      ▼                      ▼
+    П05 КЛАДОВАЯ  П06 КОРИДОР        П10 МАСТЕР-           П12 ПОСТИРОЧНАЯ
+                  ДЕТСКИЙ            СПАЛЬНЯ               КОТЕЛЬНАЯ
+                    │                    │
+               ┌────┼────┐               ▼
+               │    │    │          П11 МАСТЕР-
+               ▼    ▼    ▼          САНУЗЕЛ
+              П07  П08  П09
+          Дет.1 Дет.2 Дет.сан.</div>
+    <div class="callout callout-info" style="margin-top:10px"><strong>П03 Коридор общий — главный хаб дома.</strong> Все маршруты проходят через него. Стрелки — дверные проёмы (физические переходы).</div>
+  </div>
+</section>
+
+<!-- ТАБЛИЦА СВЯЗЕЙ -->
+<section id="conn-table">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>Таблица связей помещений</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Помещение</th><th>Напрямую связано с</th><th>Роль в топологии</th></tr></thead>
+      <tbody>
+        <tr><td><strong>П01 Прихожая</strong></td><td>П02 Гардеробная, П03 Коридор общий</td><td><span class="badge badge-orange">Входная точка</span></td></tr>
+        <tr><td><strong>П02 Гардеробная</strong></td><td>П01 Прихожая</td><td><span class="badge badge-gray">Тупик — только через П01</span></td></tr>
+        <tr><td><strong>П03 Коридор общий</strong></td><td>П01, П04, П05, П06, П10, П11, П12</td><td><span class="badge badge-blue">Узловое — связано со всеми</span></td></tr>
+        <tr><td><strong>П04 Кухня-гостиная</strong></td><td>П03 Коридор общий</td><td><span class="badge badge-green">Главная жилая зона</span></td></tr>
+        <tr><td><strong>П05 Кладовая</strong></td><td>П03 Коридор общий</td><td><span class="badge badge-gray">Тупик — только через П03</span></td></tr>
+        <tr><td><strong>П06 Коридор детский</strong></td><td>П03, П07, П08, П09</td><td><span class="badge badge-blue">Узел детского крыла</span></td></tr>
+        <tr><td><strong>П07 Детская №1</strong></td><td>П06 Коридор детский</td><td><span class="badge badge-gray">Тупик — только через П06</span></td></tr>
+        <tr><td><strong>П08 Детская №2</strong></td><td>П06 Коридор детский</td><td><span class="badge badge-gray">Тупик — только через П06</span></td></tr>
+        <tr><td><strong>П09 Детский санузел</strong></td><td>П06 Коридор детский</td><td><span class="badge badge-gray">Тупик — только через П06</span></td></tr>
+        <tr><td><strong>П10 Мастер-спальня</strong></td><td>П03 Коридор общий, П11 Санузел</td><td><span class="badge badge-green">Смежный санузел (en-suite)</span></td></tr>
+        <tr><td><strong>П11 Мастер-санузел</strong></td><td>П10 Спальня, П03 Коридор</td><td><span class="badge badge-blue">Доступ из спальни и коридора</span></td></tr>
+        <tr><td><strong>П12 Постирочная-котельная</strong></td><td>П03 Коридор общий</td><td><span class="badge badge-gray">Тупик — только через П03</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ТРАССЫ -->
+<section id="routes">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>Трассы движения человека</h2>
+  </div>
+  <div class="section-body">
+    <div class="route-grid">
+
+      <div class="route-card">
+        <div class="route-label">Трасса А</div>
+        <div class="route-title">Приход домой (базовая)</div>
+        <div class="route-path">УЛИЦА → П01 → П02 (гардероб)
+         → П03 → П04</div>
+        <div class="route-light">💡 Свет: П01 + П02 + П03 + П04</div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-label">Трасса Б</div>
+        <div class="route-title">Из гостиной в спальню (вечер)</div>
+        <div class="route-path">П04 → П03 → П10 → П11</div>
+        <div class="route-light">💡 П04 гаснет → П03 горит → П10 вкл. → П11 по требованию</div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-label">Трасса В</div>
+        <div class="route-title">Из гостиной в детское крыло</div>
+        <div class="route-path">П04 → П03 → П06 → П07 / П08 / П09</div>
+        <div class="route-light">💡 П03 + П06 + нужная детская</div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-label">Трасса Г</div>
+        <div class="route-title">Ночной поход в санузел (мастер)</div>
+        <div class="route-path">П10 → П11 (через en-suite)</div>
+        <div class="route-light">💡 П10 остаётся 5% ночник → П11 включается 15%</div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-label">Трасса Д</div>
+        <div class="route-title">Ночной поход детей в санузел</div>
+        <div class="route-path">П07 / П08 → П06 → П09</div>
+        <div class="route-light">💡 П06 включается 10% → П09 включается 10%</div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-label">Трасса Е</div>
+        <div class="route-title">Утилитарные помещения</div>
+        <div class="route-path">П03 → П05 (кладовая)
+П03 → П12 (постирочная)</div>
+        <div class="route-light">💡 Только нужное помещение — автовключение</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ЗОНЫ -->
+<section id="zones">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>Зоны освещения</h2>
+  </div>
+  <div class="section-body">
+    <div class="zone-grid">
+      <div class="zone-card zone1">
+        <div class="zt">🏠 ЗОНА 1 — Входная</div>
+        <div class="zr"><strong>П01 + П02 + П03</strong><br>Всегда включается при приходе. Базовая навигация по дому.</div>
+      </div>
+      <div class="zone-card zone2">
+        <div class="zt">🍳 ЗОНА 2 — Гостиная</div>
+        <div class="zr"><strong>П04</strong><br>Главная социальная зона. Включается при приходе, гаснет последней.</div>
+      </div>
+      <div class="zone-card zone3">
+        <div class="zt">👧 ЗОНА 3 — Детское крыло</div>
+        <div class="zr"><strong>П06 + П07 + П08 + П09</strong><br>Включается только при движении в детскую сторону.</div>
+      </div>
+      <div class="zone-card zone4">
+        <div class="zt">🛏 ЗОНА 4 — Мастер-крыло</div>
+        <div class="zr"><strong>П10 + П11</strong><br>Включается только при движении к спальне.</div>
+      </div>
+      <div class="zone-card zone5">
+        <div class="zt">🔧 ЗОНА 5 — Утилитарные</div>
+        <div class="zr"><strong>П05 + П12</strong><br>Автономная автоматика, независимо от других зон.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- СОБЫТИЯ -->
+<section id="events">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>Логика включения света по событиям</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="subsec">
+      <div class="subsec-title">5.1 — «Человек пришёл домой»</div>
+      <table>
+        <thead><tr><th>Действие</th><th>Помещение</th><th>Яркость</th><th>Задержка</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-green">Включить</span></td><td>П01 Прихожая</td><td><strong>100%</strong></td><td>0 сек</td></tr>
+          <tr><td><span class="badge badge-green">Включить</span></td><td>П02 Гардеробная</td><td><strong>80%</strong></td><td>0 сек</td></tr>
+          <tr><td><span class="badge badge-green">Включить</span></td><td>П03 Коридор общий</td><td><strong>80%</strong></td><td>0 сек</td></tr>
+          <tr><td><span class="badge badge-green">Включить</span></td><td>П04 Кухня-гостиная</td><td><strong>60%</strong></td><td>5 сек</td></tr>
+          <tr><td><span class="badge badge-gray">Не включать</span></td><td>П06, П07, П08, П09</td><td>—</td><td>ждём движения</td></tr>
+          <tr><td><span class="badge badge-gray">Не включать</span></td><td>П10, П11</td><td>—</td><td>ждём движения</td></tr>
+          <tr><td><span class="badge badge-gray">Не включать</span></td><td>П05, П12</td><td>—</td><td>автономно</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-info">При отсутствии движения в П01 более 15 мин → снизить до 20%</div>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">5.2 — Движение из П03 в сторону П06 (детское крыло)</div>
+      <table>
+        <thead><tr><th>Действие</th><th>Помещение</th><th>Яркость</th><th>Задержка</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-green">Включить</span></td><td>П06 Коридор детский</td><td><strong>70%</strong></td><td>0 сек</td></tr>
+          <tr><td><span class="badge badge-gray">Не включать автоматически</span></td><td>П07, П08, П09</td><td>—</td><td>ждём — в какую дверь войдут</td></tr>
+          <tr><td><span class="badge badge-blue">Включить при входе</span></td><td>П07 или П08</td><td><strong>80%</strong></td><td>по датчику двери</td></tr>
+          <tr><td><span class="badge badge-blue">Включить при входе</span></td><td>П09 Детский санузел</td><td><strong>100%</strong></td><td>по датчику двери</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">5.3 — Движение из П03 в сторону П10 (мастер-крыло)</div>
+      <table>
+        <thead><tr><th>Действие</th><th>Помещение</th><th>Яркость</th><th>Задержка</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-green">Включить</span></td><td>П10 Мастер-спальня</td><td><strong>70%</strong></td><td>0 сек</td></tr>
+          <tr><td><span class="badge badge-orange">Снизить</span></td><td>П04 Кухня-гостиная</td><td><strong>20%</strong></td><td>2 мин после выхода из П04</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">5.4 — «Ночь» (23:00 / кнопка)</div>
+      <table>
+        <thead><tr><th>Действие</th><th>Помещение</th><th>Яркость</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-gray">Выключить</span></td><td>П04 Кухня-гостиная</td><td>0%</td></tr>
+          <tr><td><span class="badge badge-gray">Выключить</span></td><td>П07, П08 Детские</td><td>0%</td></tr>
+          <tr><td><span class="badge badge-blue">Снизить до ночника</span></td><td>П10 Мастер-спальня (LED-лента)</td><td><strong>5%</strong></td></tr>
+          <tr><td><span class="badge badge-blue">Снизить до навигации</span></td><td>П01 Прихожая</td><td><strong>5%</strong></td></tr>
+          <tr><td><span class="badge badge-blue">Снизить до навигации</span></td><td>П03 Коридор общий</td><td><strong>5%</strong></td></tr>
+          <tr><td><span class="badge badge-blue">Снизить до навигации</span></td><td>П06 Коридор детский</td><td><strong>5%</strong></td></tr>
+          <tr><td><span class="badge badge-gray">Выключить (ждут датчика)</span></td><td>П09, П11 Санузлы</td><td>0%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">5.5 — «Ночное движение» (22:00–07:00)</div>
+      <div class="algo-box">Датчик сработал в П10 (спальня)
+  → Если движение к П11 (en-suite): П11 включить 15%
+  → Если движение к П03 (коридор): П03 включить 5%
+      → Если движение к П06 (детское): П06 включить 10%
+          → П09 включить 10%
+      → Если движение к П11 (санузел через коридор): П11 включить 15%
+  → Возврат в П10: всё гасить через 5 мин.
+
+Принцип: ночью свет включается только на пути — не заливает весь дом.</div>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">5.6 — «Уходим из дома»</div>
+      <table>
+        <thead><tr><th>Действие</th><th>Помещение</th><th>Яркость</th><th>Задержка</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-gray">Плавно выключить</span></td><td>П04 Кухня-гостиная</td><td>0%</td><td>0 сек</td></tr>
+          <tr><td><span class="badge badge-gray">Плавно выключить</span></td><td>П03 Коридор общий</td><td>0%</td><td>3 сек</td></tr>
+          <tr><td><span class="badge badge-gray">Плавно выключить</span></td><td>П02 Гардеробная</td><td>0%</td><td>5 сек</td></tr>
+          <tr><td><span class="badge badge-gray">Последним</span></td><td>П01 Прихожая</td><td>0%</td><td>10 сек (после закрытия двери)</td></tr>
+          <tr><td><span class="badge badge-gray">Проверить и выключить</span></td><td>Все остальные</td><td>0%</td><td>0 сек</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-info">Свет гаснет в обратном порядке движения — «провожает» до двери.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- МАТРИЦА ВХОДА -->
+<section id="entry-matrix">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2>Матрица: что включается при входе в каждое помещение</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Вошёл в →</th><th>Включается автоматически</th><th>Не включается (ждёт)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>П01 Прихожая</strong></td><td><span class="badge badge-green">П01, П02, П03, П04</span></td><td>П06–П12</td></tr>
+        <tr><td><strong>П03 Коридор общий</strong></td><td>П03 (уже горит)</td><td>Всё остальное — ждём</td></tr>
+        <tr><td><strong>П04 Кухня-гостиная</strong></td><td><span class="badge badge-green">П04</span></td><td>—</td></tr>
+        <tr><td><strong>П06 Коридор детский</strong></td><td><span class="badge badge-green">П06</span></td><td>П07, П08, П09 — ждём</td></tr>
+        <tr><td><strong>П07 Детская №1</strong></td><td><span class="badge badge-green">П07</span></td><td>—</td></tr>
+        <tr><td><strong>П08 Детская №2</strong></td><td><span class="badge badge-green">П08</span></td><td>—</td></tr>
+        <tr><td><strong>П09 Детский санузел</strong></td><td><span class="badge badge-green">П09</span></td><td>—</td></tr>
+        <tr><td><strong>П10 Мастер-спальня</strong></td><td><span class="badge badge-green">П10</span></td><td>П11 — ждём</td></tr>
+        <tr><td><strong>П11 Мастер-санузел</strong></td><td><span class="badge badge-green">П11</span></td><td>—</td></tr>
+        <tr><td><strong>П02 Гардеробная</strong></td><td><span class="badge badge-green">П02</span></td><td>—</td></tr>
+        <tr><td><strong>П05 Кладовая</strong></td><td><span class="badge badge-green">П05</span></td><td>—</td></tr>
+        <tr><td><strong>П12 Постирочная</strong></td><td><span class="badge badge-green">П12</span></td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ТАЙМАУТЫ -->
+<section id="timeouts">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2>Автоматическое выключение — таймауты</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Помещение</th><th>Таймаут</th><th>Режим</th></tr></thead>
+      <tbody>
+        <tr><td><strong>П01 Прихожая</strong></td><td>15 мин → 20%; ещё 10 мин → выкл.</td><td>День</td></tr>
+        <tr><td><strong>П01 Прихожая</strong></td><td>5 мин → выкл.</td><td>Ночь</td></tr>
+        <tr><td><strong>П02 Гардеробная</strong></td><td>2 мин без движения → выкл.</td><td>Любой</td></tr>
+        <tr><td><strong>П03 Коридор общий</strong></td><td>Горит пока есть движение в доме</td><td>День</td></tr>
+        <tr><td><strong>П03 Коридор общий</strong></td><td>5% пока хоть один человек дома</td><td>Ночь</td></tr>
+        <tr><td><strong>П04 Кухня-гостиная</strong></td><td><span class="badge badge-orange">Не гаснет сам — только по сценарию</span></td><td>День</td></tr>
+        <tr><td><strong>П05 Кладовая</strong></td><td>3 мин без движения → выкл.</td><td>Любой</td></tr>
+        <tr><td><strong>П06 Коридор детский</strong></td><td>10 мин без движения → выкл.</td><td>День</td></tr>
+        <tr><td><strong>П06 Коридор детский</strong></td><td>5 мин → выкл.</td><td>Ночь</td></tr>
+        <tr><td><strong>П07, П08 Детские</strong></td><td><span class="badge badge-orange">Не гаснут сами — только кнопка/сценарий</span></td><td>День</td></tr>
+        <tr><td><strong>П07, П08 Детские</strong></td><td>30 мин → выкл. (режим засыпания)</td><td>Ночь</td></tr>
+        <tr><td><strong>П09 Детский санузел</strong></td><td>5 мин без движения → выкл.</td><td>Любой</td></tr>
+        <tr><td><strong>П10 Мастер-спальня</strong></td><td><span class="badge badge-orange">Не гаснет сам — только кнопка/сценарий</span></td><td>День</td></tr>
+        <tr><td><strong>П10 Мастер-спальня</strong></td><td>Ночник 5% постоянно</td><td>Ночь</td></tr>
+        <tr><td><strong>П11 Мастер-санузел</strong></td><td>10 мин без движения → выкл.</td><td>День</td></tr>
+        <tr><td><strong>П11 Мастер-санузел</strong></td><td>5 мин → выкл.</td><td>Ночь</td></tr>
+        <tr><td><strong>П12 Постирочная</strong></td><td>5 мин без движения → выкл.</td><td>Любой</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ДАТЧИК ОСВЕЩЁННОСТИ -->
+<section id="lux">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2>Датчик освещённости — адаптивная логика</h2>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-ok">Датчик освещённости подключён к SPIDER2 (Analog Input 1). В проекте 11 датчиков движения ДД-1..ДД-11.</div>
+
+    <div class="subsec" style="margin-top:14px">
+      <div class="subsec-title">Алгоритм принятия решения</div>
+      <div class="algo-box">При срабатывании любого триггера (движение / расписание):
+
+  Если Е(факт) >= Е(порог):
+      → Свет НЕ включать (достаточно естественного)
+      → Открыть шторы (пропустить больше света)
+
+  Если Е(факт) < Е(порог):
+      → Включить свет на рассчитанный уровень
+      → Яркость = пропорционально дефициту (чем темнее — тем ярче)
+
+  После открытия штор — перепроверить:
+      → Если теперь Е(факт) >= Е(порог): выключить / снизить свет</div>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">Пороги освещённости</div>
+      <table>
+        <thead><tr><th>Ситуация</th><th>Порог</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td>Утро — включить ли свет</td><td><strong>200 лк</strong></td><td>Зима 07:00 — темно (30 лк) → свет вкл.</td></tr>
+          <tr><td>Утро — включить ли свет</td><td><strong>200 лк</strong></td><td>Лето 07:00 — светло (800 лк) → свет НЕ вкл.</td></tr>
+          <tr><td>День — поддержка рабочего освещения</td><td><strong>300 лк</strong></td><td>Пасмурный день (100 лк) → свет вкл.</td></tr>
+          <tr><td>Вечер — когда включить</td><td><strong>100 лк</strong></td><td>Закат (80 лк) → свет вкл.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-info">Все пороги настраиваются в приложении INSYTE.</div>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">Применение по помещениям</div>
+      <table>
+        <thead><tr><th>Помещение</th><th>Датчик освещённости</th><th>Логика</th></tr></thead>
+        <tbody>
+          <tr><td>П04 Кухня-гостиная</td><td>Основной (через окна)</td><td>Утро, день — главный датчик дома</td></tr>
+          <tr><td>П10 Мастер-спальня</td><td>По датчику гостиной или отдельный</td><td>Утро — не включать если светло</td></tr>
+          <tr><td>П07, П08 Детские</td><td>По датчику гостиной</td><td>Утро — не включать если светло</td></tr>
+          <tr><td>П01 Прихожая</td><td>Нет окон — датчик не нужен</td><td>Всегда включать по движению</td></tr>
+          <tr><td>П02 Гардеробная</td><td>Нет окон</td><td>Всегда включать при входе</td></tr>
+          <tr><td>П03, П06 Коридоры</td><td>Нет окон</td><td>Всегда включать по движению</td></tr>
+          <tr><td>П09, П11 Санузлы</td><td>Нет окон</td><td>Всегда включать по движению</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">Сезонный эффект (без перепрограммирования)</div>
+      <table>
+        <thead><tr><th>Месяц</th><th>Рассвет (Москва)</th><th>В 07:00</th><th>Результат</th></tr></thead>
+        <tbody>
+          <tr><td>Декабрь</td><td>09:00</td><td>Темно, ~10 лк</td><td><span class="badge badge-orange">Свет включается</span></td></tr>
+          <tr><td>Март</td><td>06:30</td><td>Светло, ~300 лк</td><td><span class="badge badge-green">Свет НЕ включается</span></td></tr>
+          <tr><td>Июнь</td><td>04:45</td><td>Очень светло, &gt;500 лк</td><td><span class="badge badge-green">Свет НЕ включается</span></td></tr>
+          <tr><td>Сентябрь</td><td>07:00</td><td>Пасмурно, 50–150 лк</td><td><span class="badge badge-blue">Зависит от погоды</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ПРИОРИТЕТЫ -->
+<section id="priority">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2>Правила приоритетов</h2>
+  </div>
+  <div class="section-body">
+    <ul class="prio-list">
+      <li><div><strong>Тревога (протечка / дым)</strong> — переопределяет любой сценарий. Все 100%.</div></li>
+      <li><div><strong>Ночной режим</strong> — переопределяет ручное включение (кроме санузлов — они по датчику).</div></li>
+      <li><div><strong>Ручное управление</strong> — переопределяет автоматику (нажал на панели — автоматика не трогает до следующего сценария).</div></li>
+      <li><div><strong>Геофенсинг «Уходим»</strong> — переопределяет любое ручное включение.</div></li>
+    </ul>
+  </div>
+</section>
+
+<style>
+.team-block{background:#0b1413;border-top:3px solid #c9a36a;margin:48px -48px -40px;padding:48px 48px 60px;}
+.team-block .tb-label{display:block;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:#c9a36a;font-weight:600;margin-bottom:36px;}
+.team-block .tb-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;}
+.team-block .tb-tag{font-family:'Inter',sans-serif;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:8px;}
+.team-block .tb-co{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;letter-spacing:.06em;color:#fff;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid rgba(201,163,106,.18);}
+.team-block .tb-member{display:grid;grid-template-columns:120px 1fr auto;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.team-block .tb-role{font-family:'Inter',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);}
+.team-block .tb-name{font-family:'Inter',sans-serif;font-size:13px;color:#fff;font-weight:300;letter-spacing:.02em;}
+.team-block .tb-phone{font-family:'Inter',sans-serif;font-size:12px;color:#c9a36a;text-decoration:none;letter-spacing:.04em;white-space:nowrap;transition:color .2s;}
+.team-block .tb-phone:hover{color:#d9b67e;}
+@media(max-width:600px){.team-block .tb-grid{grid-template-columns:1fr;gap:32px;}.team-block .tb-member{grid-template-columns:1fr;gap:2px;}}
+</style>
+<section class="team-block" id="team">
+  <span class="tb-label">Рабочая группа</span>
+  <div class="tb-grid">
+    <div>
+      <div class="tb-tag">Заказчик</div>
+      <div class="tb-co">IDEA HOUSE</div>
+      <div class="tb-member">
+        <span class="tb-role">Руководитель</span>
+        <span class="tb-name">Александр Скрябин</span>
+        <a href="https://t.me/+79128275474" class="tb-phone">+7 912 827-54-74</a>
+      </div>
+      <div class="tb-member">
+        <span class="tb-role">Монтаж</span>
+        <span class="tb-name">Андрей Иванчиков</span>
+        <a href="https://t.me/+79853646150" class="tb-phone">+7 985 364-61-50</a>
+      </div>
+      <div class="tb-member">
+        <span class="tb-role">Дизайнер</span>
+        <span class="tb-name">Виталия Подольская</span>
+        <a href="https://t.me/+79255944490" class="tb-phone">+7 925 594-44-90</a>
+      </div>
+    </div>
+    <div>
+      <div class="tb-tag">Исполнитель</div>
+      <div class="tb-co">INSYTE GROUP</div>
+      <div class="tb-member">
+        <span class="tb-role">Руководитель</span>
+        <span class="tb-name">Сергей Грибанов</span>
+        <a href="https://t.me/+79824600020" class="tb-phone">+7 982 460-00-20</a>
+      </div>
+      <div class="tb-member">
+        <span class="tb-role">Проектировщик</span>
+        <span class="tb-name">Максим Чекмарев</span>
+        <a href="https://t.me/+79144719822" class="tb-phone">+7 914 471-98-22</a>
+      </div>
+      <div class="tb-member">
+        <span class="tb-role">Инженер</span>
+        <span class="tb-name">Алексей Мальцев</span>
+        <a href="https://t.me/+79028080736" class="tb-phone">+7 902 808-07-36</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+</body>
+</html>

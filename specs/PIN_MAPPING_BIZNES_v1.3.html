@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIN-Mapping — Бизнес v1.3 | INSYTE</title>
+<style>
+:root {
+  --bg: #f5f6f8;
+  --white: #ffffff;
+  --navy: #1a2340;
+  --blue: #2563eb;
+  --blue-light: #eff6ff;
+  --green: #16a34a;
+  --green-light: #f0fdf4;
+  --orange: #d97706;
+  --orange-light: #fffbeb;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --gray: #6b7280;
+  --gray-light: #f9fafb;
+  --border: #e5e7eb;
+  --text: #111827;
+  --text-sm: #374151;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; }
+
+/* LAYOUT */
+.wrapper { display: flex; min-height: 100vh; }
+nav { width: 240px; min-width: 240px; background: var(--navy); color: #cbd5e1; position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 16px 0; flex-shrink: 0; }
+main { flex: 1; padding: 24px 32px; max-width: 1100px; }
+
+/* NAV */
+.nav-logo { padding: 8px 20px 20px; color: #fff; font-size: 13px; font-weight: 700; border-bottom: 1px solid #2d3a5a; margin-bottom: 12px; line-height: 1.4; }
+.nav-logo span { display: block; color: #93c5fd; font-size: 11px; font-weight: 400; margin-top: 4px; }
+nav a { display: block; padding: 6px 20px; color: #94a3b8; text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all .15s; }
+nav a:hover { color: #fff; background: #253156; border-left-color: var(--blue); }
+nav .nav-section { padding: 12px 20px 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #4b5e7e; }
+
+/* HEADER */
+.page-header { background: var(--navy); color: #fff; border-radius: 10px; padding: 24px 28px; margin-bottom: 24px; }
+.page-header h1 { font-size: 22px; font-weight: 700; }
+.page-header .meta { display: flex; gap: 24px; margin-top: 10px; flex-wrap: wrap; }
+.page-header .meta-item { font-size: 12px; color: #94a3b8; }
+.page-header .meta-item b { color: #e2e8f0; }
+
+/* SECTIONS */
+section { background: var(--white); border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+.section-header { background: #f1f5f9; border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; gap: 10px; }
+.section-header h2 { font-size: 15px; font-weight: 700; color: var(--navy); }
+.section-header h3 { font-size: 13px; font-weight: 600; color: var(--navy); }
+.section-num { background: var(--blue); color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+.section-body { padding: 16px 20px; }
+
+/* SUBSECTION */
+.subsec { margin-bottom: 20px; }
+.subsec:last-child { margin-bottom: 0; }
+.subsec-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid var(--blue-light); }
+
+/* TABLES */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: var(--navy); color: #fff; padding: 8px 10px; text-align: left; font-size: 12px; font-weight: 600; white-space: nowrap; }
+td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: var(--gray-light); }
+tr:hover td { background: var(--blue-light); }
+td strong { color: var(--navy); }
+td code { background: #f1f5f9; border-radius: 3px; padding: 1px 5px; font-family: 'Consolas', monospace; font-size: 12px; color: #1e40af; }
+
+/* BADGES */
+.badge { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 600; }
+.badge-green { background: var(--green-light); color: var(--green); }
+.badge-orange { background: var(--orange-light); color: var(--orange); }
+.badge-red { background: var(--red-light); color: var(--red); }
+.badge-blue { background: var(--blue-light); color: var(--blue); }
+.badge-gray { background: #f3f4f6; color: var(--gray); }
+
+/* CALLOUT */
+.callout { border-radius: 6px; padding: 10px 14px; margin: 10px 0; font-size: 13px; border-left: 4px solid; }
+.callout-warn { background: var(--orange-light); border-color: var(--orange); color: #92400e; }
+.callout-info { background: var(--blue-light); border-color: var(--blue); color: #1e3a8a; }
+.callout-ok { background: var(--green-light); border-color: var(--green); color: #14532d; }
+
+/* STAT GRID */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin: 12px 0; }
+.stat-card { background: var(--gray-light); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+.stat-card .label { font-size: 11px; color: var(--gray); font-weight: 600; text-transform: uppercase; }
+.stat-card .value { font-size: 22px; font-weight: 700; color: var(--navy); margin-top: 2px; }
+.stat-card .sub { font-size: 11px; color: var(--gray); margin-top: 2px; }
+
+/* MODULE HEADER */
+.mod-header { background: #1e3a8a; color: #fff; border-radius: 6px; padding: 8px 14px; margin-bottom: 10px; font-size: 13px; font-weight: 700; }
+
+/* PRINT */
+@media print {
+  nav { display: none; }
+  main { padding: 8px; max-width: 100%; }
+  section { break-inside: avoid; }
+  .page-header { background: #1a2340 !important; -webkit-print-color-adjust: exact; }
+}
+
+/* NOTE */
+.note { font-size: 12px; color: var(--gray); font-style: italic; padding: 6px 0; }
+
+/* RELAY-IN / RELAY-OUT color */
+.type-in { color: #1d4ed8; font-weight: 600; }
+.type-out { color: #15803d; font-weight: 600; }
+.type-res { color: #9ca3af; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══ INSYTE DESIGN SYSTEM ═══ */
+:root{--bg:#f8f6f3;--dark:#0b1413;--gold:#c9a36a;--gold-h:#d9b67e;--ink:#171d2c;--ink2:#525d75;--sec-bg:#f0ece4;--border:#e0ddd8;--font-d:'Cormorant Garamond',serif;--font-s:'Inter',sans-serif;}
+*{border-radius:0!important;}
+body{background:var(--bg)!important;color:var(--ink)!important;font-family:var(--font-s)!important;}
+.wrapper{display:flex;min-height:100vh;}
+nav{background:var(--dark)!important;width:224px;min-width:224px;position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid rgba(201,163,106,.15)!important;}
+.nav-logo{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)!important;margin-bottom:6px;}
+.nav-logo img{height:14px;width:auto;display:block;}
+.nav-logo a img{height:14px;width:auto;display:block;}
+.nav-logo span{display:block;margin-top:9px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.38)!important;line-height:1.7;}
+.nav-back{display:block;margin-top:9px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)!important;text-decoration:none;transition:color .2s;}
+.nav-back:hover{color:var(--gold-h)!important;}
+.nav-section{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(201,163,106,.65)!important;padding:14px 20px 4px;font-weight:600;}
+nav a:not(.nav-back){display:block;padding:7px 20px;font-size:11px;letter-spacing:.05em;color:rgba(255,255,255,.52)!important;text-decoration:none;transition:all .15s;}
+nav a:not(.nav-back):hover{color:#fff!important;background:rgba(201,163,106,.08)!important;}
+main{flex:1;padding:40px 48px;background:var(--bg)!important;}
+.page-header{background:var(--dark)!important;color:#fff!important;padding:40px 0 32px;margin-bottom:32px;border-bottom:3px solid var(--gold)!important;}
+.page-header h1{font-family:var(--font-d)!important;font-size:clamp(26px,3vw,40px)!important;font-weight:400!important;letter-spacing:.04em!important;color:#fff!important;margin:0 0 14px!important;}
+.page-header .meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:8px;}
+.page-header .meta-item{font-size:11px;color:rgba(255,255,255,.5)!important;letter-spacing:.06em;}
+.page-header .meta-item b{color:rgba(255,255,255,.85)!important;}
+.badge,.version-badge{background:var(--gold)!important;color:var(--dark)!important;font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:2px 8px;font-weight:600;display:inline-block;}
+.section-header{background:var(--sec-bg)!important;padding:16px 22px!important;border-bottom:1px solid var(--border)!important;display:flex;align-items:center;gap:12px;}
+.section-header h2,.section-header h3{font-family:var(--font-d)!important;font-size:20px!important;font-weight:500!important;letter-spacing:.03em!important;color:var(--ink)!important;margin:0!important;}
+.section-num{background:var(--dark)!important;color:var(--gold)!important;font-size:10px;font-weight:700;letter-spacing:.1em;padding:3px 8px;flex-shrink:0;}
+section{border:1px solid var(--border)!important;background:#fff;margin-bottom:24px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--ink)!important;color:#fff!important;font-family:var(--font-s);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:10px 12px;text-align:left;border:none!important;}
+td{padding:9px 12px;border-bottom:1px solid var(--border)!important;border-left:none!important;border-right:none!important;border-top:none!important;}
+tr:nth-child(even) td{background:var(--sec-bg)!important;}
+tr:hover td{background:#e8e3d8!important;}
+.type-in{color:#1d4ed8!important;font-weight:600!important;}
+.type-out{color:#166534!important;font-weight:600!important;}
+.type-res{color:#9ca3af!important;}
+.note{border-left:3px solid var(--gold)!important;background:var(--sec-bg)!important;padding:12px 18px!important;border-top:none!important;border-right:none!important;border-bottom:none!important;}
+@media print{nav{display:none!important;}main{padding:8px;max-width:100%;}section{break-inside:avoid;}.page-header{background:var(--dark)!important;-webkit-print-color-adjust:exact;}}
+</style>
+</head>
+<body>
+<style>
+/* ═══ INSYTE FIX LAYER ═══ */
+.page-header{margin:-40px -48px 32px!important;padding:40px 48px 32px!important;}
+nav a{border-left:none!important;}
+nav a:hover{border-left:none!important;background:rgba(201,163,106,.08)!important;}
+th{white-space:normal!important;letter-spacing:.08em!important;}
+.section-body{padding:20px 24px!important;}
+.subsec-title{color:var(--ink)!important;font-family:var(--font-s)!important;font-weight:600!important;font-size:12px!important;border-bottom-color:var(--border)!important;}
+td strong{color:var(--ink)!important;}
+td code{background:var(--sec-bg)!important;color:var(--ink)!important;font-family:'Courier New',monospace!important;}
+.badge-blue{background:rgba(201,163,106,.1)!important;color:#8a6d2e!important;}
+.badge-green{background:rgba(22,163,74,.08)!important;color:#166534!important;}
+.badge-orange{background:rgba(180,83,9,.08)!important;color:#92400e!important;}
+.badge-red{background:rgba(220,38,38,.08)!important;color:#991b1b!important;}
+.badge-gray{background:var(--sec-bg)!important;color:var(--ink2)!important;}
+.callout-warn{background:#fff8f0!important;border-left-color:#b45309!important;color:#78350f!important;}
+.callout-info{background:var(--sec-bg)!important;border-left-color:var(--gold)!important;color:var(--ink)!important;}
+.callout-ok{background:#f0fdf4!important;border-left-color:#16a34a!important;color:#14532d!important;}
+</style>
+<div class="wrapper">
+
+<!-- SIDEBAR -->
+<nav>
+  <div class="nav-logo">
+    <a href="index.html"><img src="Logo INSYTE GOLD.png" alt="INSYTE"></a>
+    <span>PIN-Mapping · Бизнес v1.3</span>
+    <a href="index.html" class="nav-back">← Главная</a>
+  </div>
+  <div class="nav-section">Общее</div>
+  <a href="#spec">Спецификация оборудования</a>
+  <a href="#spider">SPIDER2 — контроллер</a>
+  <div class="nav-section">LD2-R8D (×5)</div>
+  <a href="#r8d1">R8D №1 — Прихожая / Кухня</a>
+  <a href="#r8d2">R8D №2 — Детское крыло</a>
+  <a href="#r8d3">R8D №3 — Спальня / Санузел</a>
+  <a href="#r8d4">R8D №4 — Тёплый пол / Техника</a>
+  <a href="#r8d5">R8D №5 — Тёплый пол / Димм.</a>
+  <div class="nav-section">Прочие модули</div>
+  <a href="#ind4">LD2-4IND — Датчики</a>
+  <a href="#ssd">LD2-SSD — Моторы штор</a>
+  <a href="#ir">LD2-IR — ИК-управление</a>
+  <a href="#rgbwd">LD2-RGBWD — LED-димм.</a>
+  <div class="nav-section">Итоги</div>
+  <a href="#light-table">Сводная таблица освещения</a>
+  <a href="#heat">Тёплый пол — зоны</a>
+  <a href="#check">Проверка соответствия</a>
+
+</nav>
+
+<!-- MAIN -->
+<main>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>PIN-Mapping модулей INSYTE</h1>
+  <div class="meta">
+    <div class="meta-item"><b>Объект:</b> Одноэтажный коттедж «Бизнес-версия v1.3»</div>
+    <div class="meta-item"><b>Версия:</b> 1.1</div>
+    <div class="meta-item"><b>Дата:</b> 2026-07-10</div>
+    <div class="meta-item"><b>Источник:</b> Проект Бизнес-версия v1.3.pdf</div>
+  </div>
+</div>
+
+<!-- СПЕЦИФИКАЦИЯ -->
+<section id="spec">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>Спецификация оборудования</h2>
+  </div>
+  <div class="section-body">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="label">SPIDER2</div><div class="value">1</div><div class="sub">Центральный контроллер</div></div>
+      <div class="stat-card"><div class="label">LD2-R8D</div><div class="value">5</div><div class="sub">Релейных модуля</div></div>
+      <div class="stat-card"><div class="label">LD2-4IND</div><div class="value">4</div><div class="sub">Входовых модуля</div></div>
+      <div class="stat-card"><div class="label">LD2-SSD</div><div class="value">9</div><div class="sub">Мотор-модулей штор</div></div>
+      <div class="stat-card"><div class="label">LD2-IR</div><div class="value">4</div><div class="sub">ИК-трансивера</div></div>
+      <div class="stat-card"><div class="label">LD2-RGBWD</div><div class="value">1</div><div class="sub">5-канальный диммер</div></div>
+      <div class="stat-card"><div class="label">LD2-THD</div><div class="value">1</div><div class="sub">T+RH датчик</div></div>
+      <div class="stat-card"><div class="label">LD2-TS</div><div class="value">7</div><div class="sub">Датчиков температуры</div></div>
+    </div>
+    <table>
+      <thead><tr><th>№</th><th>Код</th><th>Наименование</th><th>Кол-во</th><th>Входы</th><th>Выходы</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><code>SPIDER2</code></td><td>Контроллер умного дома</td><td>1</td><td>4 дискр. + 2 аналог.</td><td>4 реле</td></tr>
+        <tr><td>2</td><td><code>LD2-R8D</code></td><td>Релейный модуль 8 реле</td><td><strong>5</strong></td><td>8 дискр./модуль</td><td>8 реле 660 Вт/модуль</td></tr>
+        <tr><td>3</td><td><code>LD2-THD</code></td><td>Модуль T+RH</td><td>1</td><td>T+RH</td><td>—</td></tr>
+        <tr><td>4</td><td><code>LD2-TS</code></td><td>Датчик температуры</td><td><strong>7</strong></td><td>T</td><td>—</td></tr>
+        <tr><td>5</td><td><code>LD2-RGBWD</code></td><td>Диммер LED-лент</td><td>1</td><td>1 кнопочный</td><td>5 каналов ШИМ</td></tr>
+        <tr><td>6</td><td><code>LD2-4IND</code></td><td>4-входовый дискретный модуль</td><td><strong>4</strong></td><td>4 дискр./модуль</td><td>—</td></tr>
+        <tr><td>7</td><td><code>LD2-IR</code></td><td>ИК-трансивер</td><td><strong>4</strong></td><td>1 (обратная связь)</td><td>ИК-излучатель</td></tr>
+        <tr><td>8</td><td><code>LD2-SSD</code></td><td>Модуль управления шторами</td><td><strong>9</strong></td><td>2 (кнопки — не подкл.)</td><td>1 мотор</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-info" style="margin-top:12px">
+      <strong>Итого ресурсов:</strong> 60 дискр. входов · 44 реле · 9 моторов (шторы) · 4 ИК-канала · 5 LED-каналов
+    </div>
+  </div>
+</section>
+
+<!-- SPIDER2 -->
+<section id="spider">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>SPIDER2 — Центральный контроллер</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Ресурс</th><th>№</th><th>Назначение</th><th>Примечание</th></tr></thead>
+      <tbody>
+        <tr><td><span class="type-out">Relay 1</span></td><td>—</td><td><span class="badge badge-gray">Резерв</span></td><td></td></tr>
+        <tr><td><span class="type-out">Relay 2</span></td><td>—</td><td><span class="badge badge-gray">Резерв</span></td><td>Для будущего крана ХВС</td></tr>
+        <tr><td><span class="type-out">Relay 3</span></td><td>—</td><td><span class="badge badge-gray">Резерв</span></td><td></td></tr>
+        <tr><td><span class="type-out">Relay 4</span></td><td>—</td><td><span class="badge badge-gray">Резерв</span></td><td></td></tr>
+        <tr><td><span class="type-in">Input 1–4</span></td><td>—</td><td><span class="badge badge-gray">Резерв</span></td><td></td></tr>
+        <tr><td><span class="type-in">Analog 1</span></td><td>—</td><td>Датчик освещённости (лк)</td><td>Уточнить подключение</td></tr>
+        <tr><td><span class="type-in">Analog 2</span></td><td>—</td><td><span class="badge badge-gray">Резерв</span></td><td></td></tr>
+        <tr><td>RS-485</td><td>—</td><td>Шина LanDrive2 (все модули)</td><td>Протокол Modbus/RTU</td></tr>
+        <tr><td>GSM</td><td>—</td><td>SMS-оповещения</td><td>Антенна в щите</td></tr>
+        <tr><td>Ethernet</td><td>—</td><td>Приложение INSYTE</td><td>Wi-Fi роутер в щите</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- R8D №1 -->
+<section id="r8d1">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>LD2-R8D №1 — Прихожая · Коридор общий · Кухня-гостиная · Кладовая</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Тип</th><th>№ вх/вых</th><th>Помещение</th><th>Группа</th><th>Описание</th><th>Точек</th></tr></thead>
+      <tbody>
+        <tr><td><span class="type-in">IN 1</span></td><td>IN1</td><td>П01 Прихожая</td><td>Гр. В.1</td><td>Выключатель (кнопка)</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 2</span></td><td>IN2</td><td>П01 Прихожая</td><td>Гр. В.2</td><td>Выключатель (кнопка)</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 3</span></td><td>IN3</td><td>П01 Прихожая</td><td>Гр. В.3</td><td>Выключатель (кнопка)</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 4</span></td><td>IN4</td><td>П03 Коридор общий</td><td>Гр. В.4</td><td>Выключатель (кнопка)</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 5</span></td><td>IN5</td><td>П03 Коридор общий</td><td>Гр. В.5</td><td>Выключатель (кнопка)</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 6</span></td><td>IN6</td><td>П03 Коридор общий</td><td>Гр. В.6</td><td>Выключатель (кнопка)</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 7</span></td><td>IN7</td><td>П04 Кухня-гостиная</td><td>Гр. В.7</td><td>Выключатель (кнопка)</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 8</span></td><td>IN8</td><td>П05 Кладовая</td><td>Гр. В.9</td><td>Выключатель (кнопка)</td><td>—</td></tr>
+        <tr><td><span class="type-out">PR 1</span></td><td>PR-1</td><td>П01 Прихожая</td><td><strong>Гр. 1</strong></td><td>Точечное освещение</td><td>8</td></tr>
+        <tr><td><span class="type-out">PR 2</span></td><td>PR-2</td><td>П02 Гардеробная</td><td><strong>Гр. 2</strong></td><td>Точечное освещение</td><td>4</td></tr>
+        <tr><td><span class="type-out">PR 3</span></td><td>PR-3</td><td>П03 Коридор общий</td><td><strong>Гр. 3</strong></td><td>Точечное освещение</td><td>1</td></tr>
+        <tr><td><span class="type-out">PR 4</span></td><td>PR-4</td><td>П03 Коридор общий</td><td><strong>Гр. 4</strong></td><td>Точечное освещение</td><td>8</td></tr>
+        <tr><td><span class="type-out">PR 5</span></td><td>PR-5</td><td>П04 Кухня-гостиная</td><td><strong>Гр. 5</strong></td><td>Верхнее освещение</td><td>3</td></tr>
+        <tr><td><span class="type-out">PR 6</span></td><td>PR-6</td><td>П04 Кухня-гостиная</td><td><strong>Гр. 6</strong></td><td>Точечное освещение</td><td>15</td></tr>
+        <tr><td><span class="type-out">PR 7</span></td><td>PR-7</td><td>П04 Кухня-гостиная</td><td><strong>Гр. 7</strong></td><td>Верхнее освещение</td><td>1</td></tr>
+        <tr><td><span class="type-out">PR 8</span></td><td>PR-8</td><td>П05 Кладовая</td><td><strong>Гр. 9</strong></td><td>Точечное освещение</td><td>2</td></tr>
+      </tbody>
+    </table>
+    <div class="note">⚠ Гр. 8 — LED-лента П04 — на RGBWD CH1, не на R8D. В.29 (доп. кнопка прихожей) — на R8D №3 IN8.</div>
+  </div>
+</section>
+
+<!-- R8D №2 -->
+<section id="r8d2">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>LD2-R8D №2 — Коридор детский · Детские №1/2 · Детский санузел · Спальня</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Тип</th><th>№ вх/вых</th><th>Помещение</th><th>Группа</th><th>Описание</th><th>Точек</th></tr></thead>
+      <tbody>
+        <tr><td><span class="type-in">IN 1</span></td><td>IN1</td><td>П06 Коридор детский</td><td>Гр. В.10</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 2</span></td><td>IN2</td><td>П07 Детская №1</td><td>Гр. В.11</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 3</span></td><td>IN3</td><td>П07 Детская №1</td><td>Гр. В.13</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 4</span></td><td>IN4</td><td>П08 Детская №2</td><td>Гр. В.15</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 5</span></td><td>IN5</td><td>П08 Детская №2</td><td>Гр. В.16</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 6</span></td><td>IN6</td><td>П06 Коридор детский</td><td>Гр. В.18</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 7</span></td><td>IN7</td><td>П06 Коридор детский</td><td>Гр. В.19</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 8</span></td><td>IN8</td><td>П10 Мастер-спальня</td><td>Гр. В.20</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-out">PR 9</span></td><td>PR-9</td><td>П06 Коридор детский</td><td><strong>Гр. 10</strong></td><td>Верхнее освещение</td><td>2</td></tr>
+        <tr><td><span class="type-out">PR 10</span></td><td>PR-10</td><td>П07 Детская №1</td><td><strong>Гр. 11</strong></td><td>Точечное освещение</td><td>6</td></tr>
+        <tr><td><span class="type-out">PR 11</span></td><td>PR-11</td><td>П07 Детская №1</td><td><strong>Гр. 13</strong></td><td>Верхнее освещение</td><td>2</td></tr>
+        <tr><td><span class="type-out">PR 12</span></td><td>PR-12</td><td>П08 Детская №2</td><td><strong>Гр. 15</strong></td><td>Точечное освещение</td><td>8</td></tr>
+        <tr><td><span class="type-out">PR 13</span></td><td>PR-13</td><td>П08 Детская №2</td><td><strong>Гр. 16</strong></td><td>Верхнее освещение</td><td>2</td></tr>
+        <tr><td><span class="type-out">PR 14</span></td><td>PR-14</td><td>П09 Детский санузел</td><td><strong>Гр. 18</strong></td><td>Точечное освещение</td><td>4</td></tr>
+        <tr><td><span class="type-out">PR 15</span></td><td>PR-15</td><td>П09 Детский санузел</td><td><strong>Гр. 19</strong></td><td>Подвесное освещение</td><td>1</td></tr>
+        <tr><td><span class="type-out">PR 16</span></td><td>PR-16</td><td>П10 Мастер-спальня</td><td><strong>Гр. 20</strong></td><td>Точечное освещение</td><td>11</td></tr>
+      </tbody>
+    </table>
+    <div class="note">Гр. 12 (Детская №1 LED) и Гр. 14/14.2 (Детская №2 LED) — на RGBWD, не на R8D.</div>
+  </div>
+</section>
+
+<!-- R8D №3 -->
+<section id="r8d3">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>LD2-R8D №3 — Мастер-спальня · Мастер-санузел · Постирочная · Улица</h2>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-ok">Источник данных: Лист 37 «Проект Бизнес-версия v1.3.pdf»</div>
+    <table>
+      <thead><tr><th>Тип</th><th>№ вх/вых</th><th>Помещение</th><th>Группа</th><th>Описание</th><th>Точек</th></tr></thead>
+      <tbody>
+        <tr><td><span class="type-in">IN 1</span></td><td>IN1</td><td>П10 Мастер-спальня</td><td>Гр. В.21</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 2</span></td><td>IN2</td><td>П10 Мастер-спальня</td><td>Гр. В.23</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 3</span></td><td>IN3</td><td>П10 Мастер-спальня</td><td>Гр. В.24</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 4</span></td><td>IN4</td><td>П11 Мастер-санузел</td><td>Гр. В.25</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 5</span></td><td>IN5</td><td>П11 Мастер-санузел</td><td>Гр. В.26</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 6</span></td><td>IN6</td><td><strong>П12 Постирочная-котельная</strong></td><td>Гр. В.27</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 7</span></td><td>IN7</td><td><strong>П12 Постирочная-котельная</strong></td><td>Гр. В.28</td><td>Выключатель</td><td>—</td></tr>
+        <tr><td><span class="type-in">IN 8</span></td><td>IN8</td><td>П01 Прихожая (доп. точка)</td><td>Гр. В.29</td><td>Управление уличным светом</td><td>—</td></tr>
+        <tr><td><span class="type-out">PR 17</span></td><td>PR-17</td><td>П10 Мастер-спальня</td><td><strong>Гр. 21</strong></td><td>Верхнее освещение</td><td>2</td></tr>
+        <tr><td><span class="type-out">PR 18</span></td><td>PR-18</td><td>П10 Мастер-спальня</td><td><strong>Гр. 23</strong></td><td>Бра прикроватные</td><td>1</td></tr>
+        <tr><td><span class="type-out">PR 19</span></td><td>PR-19</td><td>П10 Мастер-спальня</td><td><strong>Гр. 24</strong></td><td>Бра прикроватные</td><td>1</td></tr>
+        <tr><td><span class="type-out">PR 20</span></td><td>PR-20</td><td>П11 Мастер-санузел</td><td><strong>Гр. 25</strong></td><td>Точечное освещение</td><td>9</td></tr>
+        <tr><td><span class="type-out">PR 21</span></td><td>PR-21</td><td>П11 Мастер-санузел</td><td><strong>Гр. 26</strong></td><td>Верхнее освещение</td><td>2</td></tr>
+        <tr><td><span class="type-out">PR 22</span></td><td>PR-22</td><td><strong>П12 Постирочная-котельная</strong></td><td><strong>Гр. 27</strong></td><td>Точечное освещение</td><td>6</td></tr>
+        <tr><td><span class="type-out">PR 23</span></td><td>PR-23</td><td><strong>П12 Постирочная-котельная</strong></td><td><strong>Гр. 28</strong></td><td>LED-лента (реле ON/OFF)</td><td>1</td></tr>
+        <tr><td><span class="type-out">PR 24</span></td><td>PR-24</td><td>Улица</td><td><strong>Гр. 29</strong></td><td>Уличное освещение</td><td>6 групп</td></tr>
+      </tbody>
+    </table>
+    <div class="note">Гр. 22 (Спальня LED-лента) — на RGBWD CH5. Кнопка В.22 на R8D №5 IN3.</div>
+  </div>
+</section>
+
+<!-- R8D №4 -->
+<section id="r8d4">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2>LD2-R8D №4 — Технические реле: датчики · Розетка · Мастер-LED · Тёплый пол Кол-1..6</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Тип</th><th>№ вх/вых</th><th>Функция</th><th>Группа</th><th>Примечание</th></tr></thead>
+      <tbody>
+        <tr><td><span class="type-in">IN 1</span></td><td>IN1</td><td>П04 — Датчик дыма</td><td>—</td><td>Сухой контакт, добавлен в проект</td></tr>
+        <tr><td><span class="type-in">IN 2</span></td><td>IN2</td><td>П12/улица — ДП-5 Датчик протечки</td><td>—</td><td>Кабель 32 м, добавлен в проект</td></tr>
+        <tr><td><span class="type-res">IN 3–8</span></td><td>IN3–IN8</td><td><span class="badge badge-gray">Резерв</span></td><td>—</td><td>6 входов свободны</td></tr>
+        <tr><td><span class="type-out">PR 25</span></td><td>PR-25</td><td><strong>П12 — Управляемая розетка (утюг)</strong></td><td>Гр. УР-1</td><td>Управление из приложения, без физ. кнопки</td></tr>
+        <tr><td><span class="type-out">PR 26</span></td><td>PR-26</td><td>Мастер-выключатель LED</td><td>Гр. М.выкл</td><td>Отключает питание Гр. 8, 14, 14.2</td></tr>
+        <tr><td><span class="type-out">PR 27</span></td><td>PR-27</td><td>Т.П.1 — П01 Прихожая</td><td>Кол-1</td><td>Клапан контура тёплого пола</td></tr>
+        <tr><td><span class="type-out">PR 28</span></td><td>PR-28</td><td>Т.П.2 — П04 Кухня-гостиная</td><td>Кол-2</td><td>Клапан контура тёплого пола</td></tr>
+        <tr><td><span class="type-out">PR 29</span></td><td>PR-29</td><td>Т.П.4 — П07 Детская №1</td><td>Кол-3</td><td>Клапан контура тёплого пола</td></tr>
+        <tr><td><span class="type-out">PR 30</span></td><td>PR-30</td><td>Т.П.5 — П08 Детская №2</td><td>Кол-4</td><td>Клапан контура тёплого пола</td></tr>
+        <tr><td><span class="type-out">PR 31</span></td><td>PR-31</td><td>Т.П.6 — П06 Коридор детский</td><td>Кол-5</td><td>Клапан контура тёплого пола</td></tr>
+        <tr><td><span class="type-out">PR 32</span></td><td>PR-32</td><td>Т.П.7 — П10 Спальня + П03 Коридор</td><td>Кол-6</td><td>Один контур на два помещения</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-info">Мастер-выключатель LED (PR-26): управляет питанием LED-драйверов Гр. 8, 14, 14.2 (одна силовая цепь). Гр. 12 и Гр. 22 — на отдельной цепи, мастер их не затрагивает.</div>
+  </div>
+</section>
+
+<!-- R8D №5 -->
+<section id="r8d5">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2>LD2-R8D №5 — Тёплый пол Кол-7..10 · Кнопки диммируемых групп</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Тип</th><th>№ вх/вых</th><th>Функция</th><th>Группа</th><th>Примечание</th></tr></thead>
+      <tbody>
+        <tr><td><span class="type-in">IN 1</span></td><td>IN1</td><td>П07 Детская №1 — кнопка диммирования</td><td>Гр. В.12</td><td>SPIDER2 → команда RGBWD CH2 (Гр. 12)</td></tr>
+        <tr><td><span class="type-in">IN 2</span></td><td>IN2</td><td>П08 Детская №2 — кнопка диммирования</td><td>Гр. В.17</td><td>SPIDER2 → команда RGBWD CH3+CH4 (Гр. 14/14.2)</td></tr>
+        <tr><td><span class="type-in">IN 3</span></td><td>IN3</td><td>П10 Спальня — кнопка диммирования</td><td>Гр. В.22</td><td>SPIDER2 → команда RGBWD CH5 (Гр. 22)</td></tr>
+        <tr><td><span class="type-res">IN 4–8</span></td><td>IN4–IN8</td><td><span class="badge badge-gray">Резерв</span></td><td>—</td><td>5 входов свободны</td></tr>
+        <tr><td><span class="type-out">PR 33</span></td><td>PR-33</td><td>Т.П.8 — П11 Мастер-санузел</td><td>Кол-7</td><td>Клапан контура тёплого пола</td></tr>
+        <tr><td><span class="type-res">PR 34</span></td><td>PR-34</td><td><span class="badge badge-gray">Резерв</span></td><td>Кол-8</td><td>Свободный вывод коллектора</td></tr>
+        <tr><td><span class="type-res">PR 35</span></td><td>PR-35</td><td><span class="badge badge-gray">Резерв</span></td><td>Кол-9</td><td>Свободный вывод коллектора</td></tr>
+        <tr><td><span class="type-res">PR 36</span></td><td>PR-36</td><td><span class="badge badge-gray">Резерв</span></td><td>Кол-10</td><td>Свободный вывод коллектора</td></tr>
+        <tr><td><span class="type-res">PR 37–40</span></td><td>PR-37..40</td><td><span class="badge badge-gray">Резерв</span></td><td>—</td><td>4 реле полностью свободны</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-info">IN1–3 (В.12, В.17, В.22): физические кнопки приходят на R8D, SPIDER2 читает нажатие и отправляет команду диммирования модулю RGBWD. Диммер — RGBWD, R8D только передаёт сигнал нажатия.</div>
+  </div>
+</section>
+
+<!-- 4IND -->
+<section id="ind4">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2>LD2-4IND — Датчики движения и протечки (4 модуля)</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="subsec">
+      <div class="subsec-title">4IND №1 — Датчики движения: П01 · П02 · П03 · П04</div>
+      <table>
+        <thead><tr><th>Вход</th><th>Датчик</th><th>Помещение</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><span class="type-in">IN1</span></td><td><strong>ДД-1</strong></td><td>П01 Прихожая</td><td>Датчик движения</td></tr>
+          <tr><td><span class="type-in">IN2</span></td><td><strong>ДД-2</strong></td><td>П02 Гардеробная</td><td>Датчик движения</td></tr>
+          <tr><td><span class="type-in">IN3</span></td><td><strong>ДД-3</strong></td><td>П03 Коридор общий</td><td>Датчик движения</td></tr>
+          <tr><td><span class="type-in">IN4</span></td><td><strong>ДД-4</strong></td><td>П04 Кухня-гостиная</td><td>Датчик движения</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">4IND №2 — Датчики движения: П07 · П09 · П08 · П10</div>
+      <table>
+        <thead><tr><th>Вход</th><th>Датчик</th><th>Помещение</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><span class="type-in">IN1</span></td><td><strong>ДД-5</strong></td><td>П07 Детская №1</td><td>Датчик движения</td></tr>
+          <tr><td><span class="type-in">IN2</span></td><td><strong>ДД-6</strong></td><td>П09 Детский санузел</td><td>Датчик движения</td></tr>
+          <tr><td><span class="type-in">IN3</span></td><td><strong>ДД-7</strong></td><td>П08 Детская №2</td><td>Датчик движения</td></tr>
+          <tr><td><span class="type-in">IN4</span></td><td><strong>ДД-8</strong></td><td>П10 Мастер-спальня</td><td>Датчик движения</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">4IND №3 — Датчики движения: П11 · П06 · П12</div>
+      <table>
+        <thead><tr><th>Вход</th><th>Датчик</th><th>Помещение</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><span class="type-in">IN1</span></td><td><strong>ДД-9</strong></td><td>П11 Мастер-санузел</td><td>Датчик движения</td></tr>
+          <tr><td><span class="type-in">IN2</span></td><td><strong>ДД-10</strong></td><td>П06 Коридор детский (вероятно, кабель 6 м)</td><td>Датчик движения</td></tr>
+          <tr><td><span class="type-in">IN3</span></td><td><strong>ДД-11</strong></td><td>П12 Постирочная-котельная (вероятно, кабель 4 м)</td><td>Датчик движения</td></tr>
+          <tr><td><span class="type-res">IN4</span></td><td>—</td><td><span class="badge badge-gray">Резерв</span></td><td>—</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-warn">ДД-10 и ДД-11 — назначение по Листу 34 (план), комнаты текстом не подписаны. Определено по длинам кабелей и положению на плане. Подтвердить при монтаже.</div>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">4IND №4 — Датчики протечки: ДП-1..4</div>
+      <table>
+        <thead><tr><th>Вход</th><th>Датчик</th><th>Помещение</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><span class="type-in">IN1</span></td><td><strong>ДП-1</strong></td><td>П11 Мастер-санузел (ванна)</td><td>Датчик протечки «Нептун»</td></tr>
+          <tr><td><span class="type-in">IN2</span></td><td><strong>ДП-2</strong></td><td>П04 Кухня-гостиная (мойка/ПМ)</td><td>Датчик протечки «Нептун»</td></tr>
+          <tr><td><span class="type-in">IN3</span></td><td><strong>ДП-3</strong></td><td><span class="badge badge-orange">⚠ не определено (кабель 12 м)</span></td><td>Датчик протечки «Нептун»</td></tr>
+          <tr><td><span class="type-in">IN4</span></td><td><strong>ДП-4</strong></td><td><span class="badge badge-orange">⚠ не определено (кабель 5 м)</span></td><td>Датчик протечки «Нептун»</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-ok">ДП-5 (кабель 32 м) → R8D №4 IN2 (добавлен отдельно). Датчик дыма (П04) → R8D №4 IN1.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SSD -->
+<section id="ssd">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2>LD2-SSD — Моторы штор (9 штук)</h2>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-info">IN1 и IN2 каждого модуля = Резерв. Кнопки управления шторами физически не подключены — управление только через приложение/SPIDER2.</div>
+    <table>
+      <thead><tr><th>Мотор</th><th>Помещение</th><th>Секция</th></tr></thead>
+      <tbody>
+        <tr><td><strong>MOTOR №1</strong></td><td>П04 Кухня-гостиная</td><td>Штора/жалюзи секция 1</td></tr>
+        <tr><td><strong>MOTOR №2</strong></td><td>П04 Кухня-гостиная</td><td>Штора/жалюзи секция 2</td></tr>
+        <tr><td><strong>MOTOR №3</strong></td><td>П04 Кухня-гостиная</td><td>Штора/жалюзи секция 3 (большой зал)</td></tr>
+        <tr><td><strong>MOTOR №4</strong></td><td>П07 Детская №1</td><td>Штора/жалюзи секция 1</td></tr>
+        <tr><td><strong>MOTOR №5</strong></td><td>П07 Детская №1</td><td>Штора/жалюзи секция 2</td></tr>
+        <tr><td><strong>MOTOR №6</strong></td><td>П08 Детская №2</td><td>Штора/жалюзи секция 1</td></tr>
+        <tr><td><strong>MOTOR №7</strong></td><td>П08 Детская №2</td><td>Штора/жалюзи секция 2</td></tr>
+        <tr><td><strong>MOTOR №8</strong></td><td>П10 Мастер-спальня</td><td>Штора/жалюзи секция 1</td></tr>
+        <tr><td><strong>MOTOR №9</strong></td><td>П10 Мастер-спальня</td><td>Штора/жалюзи секция 2</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:12px">
+      <table>
+        <thead><tr><th>Помещение</th><th>Площадь</th><th>Моторы</th><th>Кол-во приводов</th></tr></thead>
+        <tbody>
+          <tr><td>П04 Кухня-гостиная</td><td>40,7 м²</td><td>№1, №2, №3</td><td><strong>3</strong></td></tr>
+          <tr><td>П07 Детская №1</td><td>7,53 м²</td><td>№4, №5</td><td><strong>2</strong></td></tr>
+          <tr><td>П08 Детская №2</td><td>6,6 м²</td><td>№6, №7</td><td><strong>2</strong></td></tr>
+          <tr><td>П10 Мастер-спальня</td><td>—</td><td>№8, №9</td><td><strong>2</strong></td></tr>
+          <tr><td><strong>Итого</strong></td><td>—</td><td>—</td><td><strong>9 приводов</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- IR -->
+<section id="ir">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2>LD2-IR — ИК-трансиверы (4 штуки)</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Модуль</th><th>Группа</th><th>Помещение</th><th>Управляет</th></tr></thead>
+      <tbody>
+        <tr><td><strong>LD2-IR №1</strong></td><td>Гр. ИК-1</td><td>П04 Кухня-гостиная</td><td>HAIER CORAL DC AS35HPL2HRA (3,5 кВт)</td></tr>
+        <tr><td><strong>LD2-IR №2</strong></td><td>Гр. ИК-2</td><td>П07 Детская №1</td><td>HAIER CORAL DC AS20HPL2HRA (2,0 кВт)</td></tr>
+        <tr><td><strong>LD2-IR №3</strong></td><td>Гр. ИК-3</td><td>П08 Детская №2</td><td>HAIER CORAL DC AS20HPL2HRA (2,0 кВт)</td></tr>
+        <tr><td><strong>LD2-IR №4</strong></td><td>Гр. ИК-4</td><td>П10 Мастер-спальня</td><td>HAIER CORAL DC AS20HPL2HRA (2,0 кВт)</td></tr>
+      </tbody>
+    </table>
+    <div class="note">Управление через ИК-команды (имитация пульта ДУ). SPIDER2 → LD2-IR → кондиционер.</div>
+  </div>
+</section>
+
+<!-- RGBWD -->
+<section id="rgbwd">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h2>LD2-RGBWD — Диммер LED-лент (1 модуль · 5 каналов)</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Канал</th><th>Группа</th><th>Помещение</th><th>Тип ленты</th><th>Кнопка (R8D №5)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>CH1 (R)</strong></td><td>Гр. 8</td><td>П04 Кухня-гостиная</td><td>LED тёплый белый</td><td>нет физ. кнопки</td></tr>
+        <tr><td><strong>CH2 (G)</strong></td><td>Гр. 12</td><td>П07 Детская №1</td><td>LED тёплый белый</td><td>IN1 (Гр. В.12)</td></tr>
+        <tr><td><strong>CH3 (B)</strong></td><td>Гр. 14</td><td>П08 Детская №2 (осн.)</td><td>LED тёплый белый</td><td>IN2 (Гр. В.17)</td></tr>
+        <tr><td><strong>CH4 (W)</strong></td><td>Гр. 14.2</td><td>П08 Детская №2 (доп.)</td><td>LED тёплый белый</td><td>IN2 (Гр. В.17)</td></tr>
+        <tr><td><strong>CH5 (D)</strong></td><td>Гр. 22</td><td>П10 Мастер-спальня</td><td>LED тёплый белый</td><td>IN3 (Гр. В.22)</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-info"><strong>Мастер-выключатель LED (R8D №4 PR-26, Гр. М.выкл):</strong> отключает питание LED-драйверов Гр. 8, 14, 14.2. Гр. 12 и Гр. 22 — на отдельной цепи, мастер их не затрагивает.</div>
+  </div>
+</section>
+
+<!-- СВОДНАЯ ТАБЛИЦА ОСВЕЩЕНИЯ -->
+<section id="light-table">
+  <div class="section-header">
+    <span class="section-num">12</span>
+    <h2>Сводная таблица групп освещения по помещениям</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Помещение</th><th>Гр.</th><th>Тип</th><th>Модуль</th><th>Вход (кнопка)</th><th>Выход (реле/канал)</th></tr></thead>
+      <tbody>
+        <tr><td>П01 Прихожая</td><td>1</td><td>Точечное (8 т.)</td><td>R8D №1</td><td>IN1,2,3 (В.1,2,3), IN8 R8D№3 (В.29)</td><td>PR-1</td></tr>
+        <tr><td>П02 Гардеробная</td><td>2</td><td>Точечное (4 т.)</td><td>R8D №1</td><td>ДД-2 (авто)</td><td>PR-2</td></tr>
+        <tr><td>П03 Коридор общий</td><td>3, 4</td><td>Точечное (1+8 т.)</td><td>R8D №1</td><td>IN4,5,6 (В.4,5,6)</td><td>PR-3, PR-4</td></tr>
+        <tr><td>П04 Кухня-гостиная</td><td>5</td><td>Верхнее (3 т.)</td><td>R8D №1</td><td>IN7 (В.7)</td><td>PR-5</td></tr>
+        <tr><td>П04 Кухня-гостиная</td><td>6</td><td>Точечное (15 т.)</td><td>R8D №1</td><td>IN7 (В.7)</td><td>PR-6</td></tr>
+        <tr><td>П04 Кухня-гостиная</td><td>7</td><td>Верхнее (1 т.)</td><td>R8D №1</td><td>IN7 (В.7)</td><td>PR-7</td></tr>
+        <tr><td>П04 Кухня-гостиная</td><td><strong>8</strong></td><td><strong>LED-лента (димм.)</strong></td><td><strong>RGBWD</strong></td><td>нет физ. кнопки</td><td><strong>CH1</strong></td></tr>
+        <tr><td>П05 Кладовая</td><td>9</td><td>Точечное (2 т.)</td><td>R8D №1</td><td>IN8 (В.9)</td><td>PR-8</td></tr>
+        <tr><td>П06 Коридор детский</td><td>10</td><td>Верхнее (2 т.)</td><td>R8D №2</td><td>IN1,6,7 (В.10,18,19)</td><td>PR-9</td></tr>
+        <tr><td>П07 Детская №1</td><td>11</td><td>Точечное (6 т.)</td><td>R8D №2</td><td>IN2 (В.11)</td><td>PR-10</td></tr>
+        <tr><td>П07 Детская №1</td><td><strong>12</strong></td><td><strong>LED-лента (димм.)</strong></td><td><strong>RGBWD</strong></td><td>R8D №5 IN1 (В.12)</td><td><strong>CH2</strong></td></tr>
+        <tr><td>П07 Детская №1</td><td>13</td><td>Верхнее (2 т.)</td><td>R8D №2</td><td>IN3 (В.13)</td><td>PR-11</td></tr>
+        <tr><td>П08 Детская №2</td><td><strong>14</strong></td><td><strong>LED-лента осн. (димм.)</strong></td><td><strong>RGBWD</strong></td><td>R8D №5 IN2 (В.17)</td><td><strong>CH3</strong></td></tr>
+        <tr><td>П08 Детская №2</td><td><strong>14.2</strong></td><td><strong>LED-лента доп. (димм.)</strong></td><td><strong>RGBWD</strong></td><td>R8D №5 IN2 (В.17)</td><td><strong>CH4</strong></td></tr>
+        <tr><td>П08 Детская №2</td><td>15</td><td>Точечное (8 т.)</td><td>R8D №2</td><td>IN4 (В.15)</td><td>PR-12</td></tr>
+        <tr><td>П08 Детская №2</td><td>16</td><td>Верхнее (2 т.)</td><td>R8D №2</td><td>IN5 (В.16)</td><td>PR-13</td></tr>
+        <tr><td>П09 Детский санузел</td><td>18</td><td>Точечное (4 т.)</td><td>R8D №2</td><td>ДД-6 (авто)</td><td>PR-14</td></tr>
+        <tr><td>П09 Детский санузел</td><td>19</td><td>Подвесное (1 т.)</td><td>R8D №2</td><td>ДД-6 (авто)</td><td>PR-15</td></tr>
+        <tr><td>П10 Мастер-спальня</td><td>20</td><td>Точечное (11 т.)</td><td>R8D №2</td><td>IN8 (В.20)</td><td>PR-16</td></tr>
+        <tr><td>П10 Мастер-спальня</td><td>21</td><td>Верхнее (2 т.)</td><td>R8D №3</td><td>IN1 (В.21)</td><td>PR-17</td></tr>
+        <tr><td>П10 Мастер-спальня</td><td><strong>22</strong></td><td><strong>LED-лента (димм.)</strong></td><td><strong>RGBWD</strong></td><td>R8D №5 IN3 (В.22)</td><td><strong>CH5</strong></td></tr>
+        <tr><td>П10 Мастер-спальня</td><td>23</td><td>Бра (1 т.)</td><td>R8D №3</td><td>IN2 (В.23)</td><td>PR-18</td></tr>
+        <tr><td>П10 Мастер-спальня</td><td>24</td><td>Бра (1 т.)</td><td>R8D №3</td><td>IN3 (В.24)</td><td>PR-19</td></tr>
+        <tr><td>П11 Мастер-санузел</td><td>25</td><td>Точечное (9 т.)</td><td>R8D №3</td><td>IN4 (В.25)</td><td>PR-20</td></tr>
+        <tr><td>П11 Мастер-санузел</td><td>26</td><td>Верхнее (2 т.)</td><td>R8D №3</td><td>IN5 (В.26)</td><td>PR-21</td></tr>
+        <tr><td>П12 Постирочная-котельная</td><td>27</td><td>Точечное (6 т.)</td><td>R8D №3</td><td>IN6 (В.27)</td><td>PR-22</td></tr>
+        <tr><td>П12 Постирочная-котельная</td><td>28</td><td>LED-лента (реле ON/OFF)</td><td>R8D №3</td><td>IN7 (В.28)</td><td>PR-23</td></tr>
+        <tr><td>Улица</td><td>29</td><td>Уличное (6 гр.)</td><td>R8D №3</td><td>IN8 (В.29) R8D №3</td><td>PR-24</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:10px; display:flex; gap:16px; flex-wrap:wrap; font-size:12px;">
+      <div><span class="badge badge-blue">Реле ON/OFF: 24 группы (PR-1..PR-24)</span></div>
+      <div><span class="badge badge-green">LED-лента димм. (RGBWD): 5 каналов</span></div>
+      <div><span class="badge badge-gray">LED-лента реле: 1 (Гр. 28)</span></div>
+      <div><span class="badge badge-gray">Улица: 1 группа (Гр. 29)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ТЁПЛЫЙ ПОЛ -->
+<section id="heat">
+  <div class="section-header">
+    <span class="section-num">13</span>
+    <h2>Тёплый пол — зоны и реле</h2>
+  </div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>Зона</th><th>Помещение</th><th>Реле</th><th>Модуль</th><th>Примечание</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Т.П.1</strong></td><td>П01 Прихожая</td><td>PR-27 (Кол-1)</td><td>R8D №4, Relay 3</td><td></td></tr>
+        <tr><td><strong>Т.П.2</strong></td><td>П04 Кухня-гостиная</td><td>PR-28 (Кол-2)</td><td>R8D №4, Relay 4</td><td></td></tr>
+        <tr><td><strong>Т.П.4</strong></td><td>П07 Детская №1</td><td>PR-29 (Кол-3)</td><td>R8D №4, Relay 5</td><td></td></tr>
+        <tr><td><strong>Т.П.5</strong></td><td>П08 Детская №2</td><td>PR-30 (Кол-4)</td><td>R8D №4, Relay 6</td><td></td></tr>
+        <tr><td><strong>Т.П.6</strong></td><td>П06 Коридор детский</td><td>PR-31 (Кол-5)</td><td>R8D №4, Relay 7</td><td></td></tr>
+        <tr><td><strong>Т.П.7</strong></td><td>П10 Спальня + П03 Коридор</td><td>PR-32 (Кол-6)</td><td>R8D №4, Relay 8</td><td>Один контур на два помещения</td></tr>
+        <tr><td><strong>Т.П.8</strong></td><td>П11 Мастер-санузел</td><td>PR-33 (Кол-7)</td><td>R8D №5, Relay 1</td><td></td></tr>
+        <tr><td>—</td><td>Резерв</td><td>PR-34..36 (Кол-8..10)</td><td>R8D №5, Relay 2–4</td><td>3 свободных вывода коллектора</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-warn">Т.П.3 отсутствует в нумерации проекта. П09 (детский санузел) — данных о зоне тёплого пола нет, уточнить при монтаже.</div>
+  </div>
+</section>
+
+<!-- ПРОВЕРКА СООТВЕТСТВИЯ -->
+<section id="check">
+  <div class="section-header">
+    <span class="section-num">14</span>
+    <h2>Проверка соответствия — итог</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="subsec">
+      <div class="subsec-title">LD2-R8D: использование входов и реле</div>
+      <table>
+        <thead><tr><th>Модуль</th><th>Вх. задействовано</th><th>Вх. в резерве</th><th>Реле задействовано</th><th>Реле в резерве</th></tr></thead>
+        <tbody>
+          <tr><td>R8D №1</td><td><span class="badge badge-green">8/8</span></td><td>0</td><td><span class="badge badge-green">8/8</span></td><td>0</td></tr>
+          <tr><td>R8D №2</td><td><span class="badge badge-green">8/8</span></td><td>0</td><td><span class="badge badge-green">8/8</span></td><td>0</td></tr>
+          <tr><td>R8D №3</td><td><span class="badge badge-green">8/8</span></td><td>0</td><td><span class="badge badge-green">8/8</span></td><td>0</td></tr>
+          <tr><td>R8D №4</td><td><span class="badge badge-blue">2/8</span></td><td>6 (резерв)</td><td><span class="badge badge-green">8/8</span></td><td>0</td></tr>
+          <tr><td>R8D №5</td><td><span class="badge badge-blue">3/8</span></td><td>5 (резерв)</td><td><span class="badge badge-blue">4/8</span></td><td>4 (резерв)</td></tr>
+          <tr><td><strong>Итого</strong></td><td><strong>29/40</strong></td><td><strong>11</strong></td><td><strong>36/40</strong></td><td><strong>4</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsec">
+      <div class="subsec-title">LD2-4IND: использование входов</div>
+      <table>
+        <thead><tr><th>Модуль</th><th>Задействовано</th><th>В резерве</th></tr></thead>
+        <tbody>
+          <tr><td>4IND №1</td><td><span class="badge badge-green">4/4</span></td><td>0</td></tr>
+          <tr><td>4IND №2</td><td><span class="badge badge-green">4/4</span></td><td>0</td></tr>
+          <tr><td>4IND №3</td><td><span class="badge badge-blue">3/4</span></td><td>1</td></tr>
+          <tr><td>4IND №4</td><td><span class="badge badge-green">4/4</span></td><td>0</td></tr>
+          <tr><td><strong>Итого</strong></td><td><strong>15/16</strong></td><td><strong>1</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+      <div>
+        <div class="subsec-title">LD2-SSD: моторы</div>
+        <table>
+          <thead><tr><th>Ресурс</th><th>Использовано</th><th>Свободно</th></tr></thead>
+          <tbody>
+            <tr><td>Моторы</td><td><span class="badge badge-green">9/9</span></td><td>0</td></tr>
+            <tr><td>Входы IN1/IN2</td><td>0/18</td><td>18 (резерв)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="subsec-title">RGBWD / IR</div>
+        <table>
+          <thead><tr><th>Ресурс</th><th>Использовано</th></tr></thead>
+          <tbody>
+            <tr><td>RGBWD CH1–5</td><td><span class="badge badge-green">5/5</span></td></tr>
+            <tr><td>LD2-IR</td><td><span class="badge badge-green">4/4</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.team-block{background:#0b1413;border-top:3px solid #c9a36a;margin:48px -48px -40px;padding:48px 48px 60px;}
+.team-block .tb-label{display:block;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:#c9a36a;font-weight:600;margin-bottom:36px;}
+.team-block .tb-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;}
+.team-block .tb-tag{font-family:'Inter',sans-serif;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:8px;}
+.team-block .tb-co{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;letter-spacing:.06em;color:#fff;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid rgba(201,163,106,.18);}
+.team-block .tb-member{display:grid;grid-template-columns:120px 1fr auto;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.team-block .tb-role{font-family:'Inter',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);}
+.team-block .tb-name{font-family:'Inter',sans-serif;font-size:13px;color:#fff;font-weight:300;letter-spacing:.02em;}
+.team-block .tb-phone{font-family:'Inter',sans-serif;font-size:12px;color:#c9a36a;text-decoration:none;letter-spacing:.04em;white-space:nowrap;transition:color .2s;}
+.team-block .tb-phone:hover{color:#d9b67e;}
+@media(max-width:600px){.team-block .tb-grid{grid-template-columns:1fr;gap:32px;}.team-block .tb-member{grid-template-columns:1fr;gap:2px;}}
+</style>
+<section class="team-block" id="team">
+  <span class="tb-label">Рабочая группа</span>
+  <div class="tb-grid">
+    <div>
+      <div class="tb-tag">Заказчик</div>
+      <div class="tb-co">IDEA HOUSE</div>
+      <div class="tb-member">
+        <span class="tb-role">Руководитель</span>
+        <span class="tb-name">Александр Скрябин</span>
+        <a href="https://t.me/+79128275474" class="tb-phone">+7 912 827-54-74</a>
+      </div>
+      <div class="tb-member">
+        <span class="tb-role">Монтаж</span>
+        <span class="tb-name">Андрей Иванчиков</span>
+        <a href="https://t.me/+79853646150" class="tb-phone">+7 985 364-61-50</a>
+      </div>
+      <div class="tb-member">
+        <span class="tb-role">Дизайнер</span>
+        <span class="tb-name">Виталия Подольская</span>
+        <a href="https://t.me/+79255944490" class="tb-phone">+7 925 594-44-90</a>
+      </div>
+    </div>
+    <div>
+      <div class="tb-tag">Исполнитель</div>
+      <div class="tb-co">INSYTE GROUP</div>
+      <div class="tb-member">
+        <span class="tb-role">Руководитель</span>
+        <span class="tb-name">Сергей Грибанов</span>
+        <a href="https://t.me/+79824600020" class="tb-phone">+7 982 460-00-20</a>
+      </div>
+      <div class="tb-member">
+        <span class="tb-role">Проектировщик</span>
+        <span class="tb-name">Максим Чекмарев</span>
+        <a href="https://t.me/+79144719822" class="tb-phone">+7 914 471-98-22</a>
+      </div>
+      <div class="tb-member">
+        <span class="tb-role">Инженер</span>
+        <span class="tb-name">Алексей Мальцев</span>
+        <a href="https://t.me/+79028080736" class="tb-phone">+7 902 808-07-36</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+</body>
+</html>
