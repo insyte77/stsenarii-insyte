@@ -136,7 +136,7 @@ Gold-вариант: `background: rgba(201,163,106,.25); color: var(--gold)`
 
 ---
 
-## Структура страницы (index.html)
+## Структура страницы (box4life.html)
 
 ```
 NAV (fixed, 72px) — логотип слева, ссылки справа
@@ -157,7 +157,7 @@ FOOTER (--dark2)
 
 | Файл | Описание |
 |------|----------|
-| `specs/index.html` | Главная страница, **автономный** (шрифты + логотип встроены base64), ~2.3 MB |
+| `specs/box4life.html` | Главная страница, **автономный** (шрифты + логотип встроены base64), ~2.3 MB |
 | `specs/PIN_MAPPING_BIZNES_v1.3.html` | Пин-маппинг оборудования |
 | `specs/LIGHTING_LOGIC_BIZNES_v1.3.html` | Логика освещения |
 | `specs/SCENARIOS_BIZNES_v1.3.html` | Сценарии умного дома |
